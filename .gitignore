@@ -1,22 +1,98 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+
+# Virtual environment
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# IDE
 .vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-file
-*.flf
-#Test results file
-TestResults.xml
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+uvicorn.log
+*.log.*
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# ML models
+models/
+*.bin
+*.pth
+*.pt
+*.h5
+*.keras
+*.joblib
+*.safetensors
+
+# Transformers cache
+.cache/
+transformers/
+
+# Data files
+*.csv
+*.json
+*.parquet
+*.feather
+*.hdf5
+*.npz
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# FastAPI specific
+__pycache__/
+*.pyc
+.mypy_cache/
+.pytest_cache/
+
+# Build outputs
+.coverage
+htmlcov/
+.coverage.*
+.pytest_cache/
