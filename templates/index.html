@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Product Extractor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        #urlInput {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #219a52;
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin: 1rem 0;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin: 1rem 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats {
+            background: #e9ecef;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Furniture Product Extractor</h1>
+            <p>Извлечение названий товаров с сайтов мебельных магазинов</p>
+        </header>
+
+        <div class="content">
+            <form id="extractForm" method="POST" action="/extract">
+                <div class="input-group">
+                    <input type="url" id="urlInput" name="url" placeholder="https://example.com/products/..." required>
+                    <button type="submit">Извлечь товары</button>
+                </div>
+            </form>
+
+            {% if error %}
+            <div class="error">
+                <strong>Ошибка:</strong> {{ error }}
+            </div>
+            {% endif %}
+
+            {% if products is not none %}
+            <div class="results">
+                {% if products %}
+                <div class="success">
+                    <strong>Успешно!</strong> Найдено товаров: {{ products_count }}
+                </div>
+                
+                <div class="stats">
+                    <strong>Анализированный URL:</strong> {{ url }}
+                </div>
+
+                <h2>Извлеченные товары:</h2>
+                {% for product in products %}
+                <div class="product-card">
+                    <strong>{{ loop.index }}.</strong> {{ product }}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="error">
+                    Товары не найдены. Попробуйте другой URL.
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Анализ страницы...</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by FastAPI & Transformers | Furniture Product Extraction System</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('extractForm').addEventListener('submit', function() {
+            document.getElementById('loading').classList.remove('hidden');
+        });
+
+        // Сохраняем URL в input после отправки формы
+        {% if url %}
+        document.getElementById('urlInput').value = '{{ url }}';
+        {% endif %}
+    </script>
+</body>
+</html>
