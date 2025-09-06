@@ -4,7 +4,7 @@ Web application for extracting product names from furniture websites using AI.
 
 ## Quick Start
 
-### 1. Install & Run
+### Install & Run
 ```bash
 # Clone and setup
 git clone https://github.com/your-username/furniture-ner-extractor.git
