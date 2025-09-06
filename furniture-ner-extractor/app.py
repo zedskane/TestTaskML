@@ -31,7 +31,7 @@ app.add_middleware(
 templates = Jinja2Templates(directory="templates")
 
 # Подключение статических файлов
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
