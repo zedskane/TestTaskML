@@ -1,8 +1,8 @@
-#  Furniture Product Extractor
+# Furniture Product Extractor
 
 Web application for extracting product names from furniture websites using AI.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install & Run
 ```bash
@@ -15,3 +15,6 @@ pip install -r requirements.txt
 
 # Launch application
 uvicorn app:app --reload
+
+# Open in Browser
+http://localhost:8000
