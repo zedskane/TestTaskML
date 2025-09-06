@@ -1,9 +1,17 @@
-# Furniture Product Extractor
+#  Furniture Product Extractor
 
-Система для извлечения названий товаров с сайтов мебельных магазинов с использованием NER модели и анализа ключевых слов.
+Web application for extracting product names from furniture websites using AI.
 
-## 🚀 Быстрый старт
+## 🚀 Quick Start
 
-1. **Установка зависимостей:**
+### 1. Install & Run
 ```bash
+# Clone and setup
+git clone https://github.com/your-username/furniture-ner-extractor.git
+cd furniture-ner-extractor
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Launch application
+uvicorn app:app --reload
