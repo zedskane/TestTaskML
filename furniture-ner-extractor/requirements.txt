@@ -1,11 +1,32 @@
+# FastAPI web framework for building APIs with high performance
 fastapi==0.104.1
+
+# ASGI server for running FastAPI applications
 uvicorn==0.24.0
+
+# Template engine for HTML rendering in web applications
 jinja2==3.1.2
+
+# HTTP library for making requests to web pages and APIs
 requests==2.31.0
+
+# HTML/XML parser for web scraping and data extraction
 beautifulsoup4==4.12.2
+
+# Transformers library for natural language processing (NER model)
 transformers==4.35.2
+
+# PyTorch deep learning framework (required for transformers)
 torch==2.1.1
+
+# Multipart form data handling for file uploads and form processing
 python-multipart==0.0.6
+
+# Library for accelerating machine learning model inference
 accelerate==0.24.1
+
+# Tokenization library for subword text processing
 sentencepiece==0.1.99
+
+# Protocol Buffers data serialization format
 protobuf==3.20.3
