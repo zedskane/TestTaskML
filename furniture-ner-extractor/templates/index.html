@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -148,20 +148,20 @@
     <div class="container">
         <header>
             <h1>Furniture Product Extractor</h1>
-            <p>Извлечение названий товаров с сайтов мебельных магазинов</p>
+            <p>Extract product names from furniture store websites</p>
         </header>
 
         <div class="content">
             <form id="extractForm" method="POST" action="/extract">
                 <div class="input-group">
                     <input type="url" id="urlInput" name="url" placeholder="https://example.com/products/..." required>
-                    <button type="submit">Извлечь товары</button>
+                    <button type="submit">Extract Products</button>
                 </div>
             </form>
 
             {% if error %}
             <div class="error">
-                <strong>Ошибка:</strong> {{ error }}
+                <strong>Error:</strong> {{ error }}
             </div>
             {% endif %}
 
@@ -169,14 +169,14 @@
             <div class="results">
                 {% if products %}
                 <div class="success">
-                    <strong>Успешно!</strong> Найдено товаров: {{ products_count }}
+                    <strong>Success!</strong> Products found: {{ products_count }}
                 </div>
                 
                 <div class="stats">
-                    <strong>Анализированный URL:</strong> {{ url }}
+                    <strong>Analyzed URL:</strong> {{ url }}
                 </div>
 
-                <h2>Извлеченные товары:</h2>
+                <h2>Extracted Products:</h2>
                 {% for product in products %}
                 <div class="product-card">
                     <strong>{{ loop.index }}.</strong> {{ product }}
@@ -184,7 +184,7 @@
                 {% endfor %}
                 {% else %}
                 <div class="error">
-                    Товары не найдены. Попробуйте другой URL.
+                    No products found. Please try a different URL.
                 </div>
                 {% endif %}
             </div>
@@ -192,7 +192,7 @@
 
             <div id="loading" class="loading hidden">
                 <div class="spinner"></div>
-                <p>Анализ страницы...</p>
+                <p>Analyzing page content...</p>
             </div>
         </div>
 
@@ -202,11 +202,12 @@
     </div>
 
     <script>
+        // Show loading spinner when form is submitted
         document.getElementById('extractForm').addEventListener('submit', function() {
             document.getElementById('loading').classList.remove('hidden');
         });
 
-        // Сохраняем URL в input после отправки формы
+        // Preserve URL input value after form submission
         {% if url %}
         document.getElementById('urlInput').value = '{{ url }}';
         {% endif %}
