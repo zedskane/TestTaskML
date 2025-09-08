@@ -1,18 +1,18 @@
 """
-Модуль для извлечения названий товаров с помощью NER модели и ключевых слов
-Комбинированный подход для максимальной эффективности
+Module for extracting product names using NER model and keyword analysis
+Combined approach for maximum effectiveness in furniture product recognition
 """
 
 from transformers import pipeline
 import re
 from typing import List, Optional
 
-# Глобальные переменные для кэширования модели
+# Global variables for model caching
 _ner_model = None
 _furniture_keywords = None
 
 def get_ner_model():
-    """Ленивая загрузка NER модели"""
+    """Lazy loading of NER model to optimize resource usage"""
     global _ner_model
     if _ner_model is None:
         try:
@@ -20,19 +20,19 @@ def get_ner_model():
                 "ner",
                 model="dslim/bert-base-NER",
                 aggregation_strategy="simple",
-                device=-1  # Использовать CPU
+                device=-1  # Use CPU for compatibility
             )
         except Exception as e:
-            print(f"Ошибка загрузки NER модели: {e}")
+            print(f"Error loading NER model: {e}")
             _ner_model = None
     return _ner_model
 
 def get_furniture_keywords():
-    """Ключевые слова для мебельной тематики"""
+    """Comprehensive furniture-related keywords for product identification"""
     global _furniture_keywords
     if _furniture_keywords is None:
         _furniture_keywords = [
-            # English keywords
+            # English furniture keywords
             "sofa", "chair", "table", "bed", "desk", "lamp", "mirror", "cabinet",
             "shelf", "ottoman", "bench", "stool", "dresser", "nightstand", "bookcase",
             "wardrobe", "dining", "living", "bedroom", "office", "kitchen", "bathroom",
@@ -41,7 +41,7 @@ def get_furniture_keywords():
             "furniture", "collection", "series", "set", "armchair", "recliner",
             "sectional", "loveseat", "console", "coffee", "side", "accents",
             
-            # Russian keywords
+            # Russian furniture keywords
             "диван", "стул", "стол", "кровать", "кресло", "лампа", "зеркало", "шкаф",
             "полка", "пуф", "скамья", "табурет", "комод", "тумба", "стеллаж", "гардероб",
             "столовая", "гостиная", "спальня", "офис", "кухня", "ванная", "уличная",
@@ -52,7 +52,7 @@ def get_furniture_keywords():
     return _furniture_keywords
 
 def extract_products(text: str) -> List[str]:
-    """Извлекает названия товаров из текста с помощью NER модели"""
+    """Extract product names from text using NER model with entity recognition"""
     if not text or not text.strip():
         return []
 
@@ -63,7 +63,7 @@ def extract_products(text: str) -> List[str]:
         return products
 
     try:
-        # Обрабатываем первые 2000 символов для скорости
+        # Process first 2000 characters for performance optimization
         short_text = text[:2000]
         entities = model(short_text)
 
@@ -72,21 +72,21 @@ def extract_products(text: str) -> List[str]:
             score = entity.get('score', 0.0)
             entity_type = entity.get('entity_group', '')
 
-            # Фильтруем по score и типу сущности
+            # Filter entities by confidence score and relevant types
             if (score > 0.5 and entity_type in ['ORG', 'PRODUCT', 'MISC'] and
                 len(word) > 2 and not word.isdigit()):
-                # Очищаем слово
+                # Clean special characters while preserving hyphens
                 clean_word = re.sub(r'[^\w\s\-]', '', word)
                 if len(clean_word) > 2:
                     products.append(clean_word)
 
     except Exception as e:
-        print(f"Ошибка NER обработки: {e}")
+        print(f"NER processing error: {e}")
 
     return products
 
 def analyze_text_with_keywords(text: str) -> List[str]:
-    """Анализ текста с помощью ключевых слов мебельной тематики"""
+    """Analyze text using furniture-specific keyword matching and context extraction"""
     if not text:
         return []
 
@@ -95,25 +95,25 @@ def analyze_text_with_keywords(text: str) -> List[str]:
     text_lower = text.lower()
 
     try:
-        # Поиск предложений с ключевыми словами
+        # Split text into sentences for contextual analysis
         sentences = re.split(r'[.!?]', text)
         
         for sentence in sentences:
             sentence_lower = sentence.lower()
             
-            # Проверяем наличие ключевых слов в предложении
+            # Identify sentences containing relevant furniture keywords
             found_keywords = [
                 keyword for keyword in keywords 
                 if keyword in sentence_lower and len(keyword) > 2
             ]
             
             if found_keywords:
-                # Очищаем предложение и добавляем как потенциальный продукт
+                # Clean and validate potential product sentences
                 clean_sentence = re.sub(r'\s+', ' ', sentence).strip()
                 if 10 <= len(clean_sentence) <= 150:
                     products.append(clean_sentence)
 
-        # Поиск отдельных слов, содержащих ключевые слова
+        # Extract individual words containing furniture keywords
         words = re.findall(r'\b\w+\b', text)
         for word in words:
             word_lower = word.lower()
@@ -122,15 +122,16 @@ def analyze_text_with_keywords(text: str) -> List[str]:
                     products.append(word)
 
     except Exception as e:
-        print(f"Ошибка keyword анализа: {e}")
+        print(f"Keyword analysis error: {e}")
 
     return products
 
 def combined_extraction(text: str) -> List[str]:
-    """Комбинированное извлечение продуктов"""
+    """Combine NER and keyword extraction methods for comprehensive product identification"""
     ner_results = extract_products(text)
     keyword_results = analyze_text_with_keywords(text)
     
+    # Merge and deduplicate results from both methods
     all_results = ner_results + keyword_results
     unique_results = list(set(all_results))
     
