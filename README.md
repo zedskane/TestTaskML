@@ -7,7 +7,7 @@ Web application for extracting product names from furniture websites using AI.
 ### Install & Run
 ```bash
 # Clone and setup
-git clone https://github.com/your-username/furniture-ner-extractor.git
+git clone https://github.com/zedskane/TestTaskML.git
 cd furniture-ner-extractor
 
 # Install dependencies
