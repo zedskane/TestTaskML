@@ -1,5 +1,6 @@
 """
-Модуль для парсинга веб-страниц и извлечения текста и структурированных данных
+Module for web page parsing and extraction of text content and structured data
+Supports multiple data formats including JSON-LD, microdata, and meta tags
 """
 
 import requests
@@ -10,7 +11,7 @@ from typing import List, Optional, Dict
 from urllib.parse import urlparse
 
 def get_page_text(url: str) -> Optional[str]:
-    """Парсит текст со страницы"""
+    """Extracts and cleans text content from a web page with proper error handling"""
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -21,30 +22,34 @@ def get_page_text(url: str) -> Optional[str]:
             "Upgrade-Insecure-Requests": "1"
         }
 
+        # Fetch webpage with timeout and headers
         response = requests.get(url, timeout=15, headers=headers)
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Удаляем ненужные теги
+        # Remove non-content elements for cleaner text extraction
         for tag in soup(["script", "style", "noscript", "header", "footer", "nav", "aside"]):
             tag.decompose()
 
-        # Извлекаем текст
+        # Extract text content with proper spacing
         text = soup.get_text(" ", strip=True)
         
-        # Очищаем текст
-        text = re.sub(r'\s+', ' ', text)
-        text = re.sub(r'[^\w\s.,!?$-]', ' ', text)
+        # Clean and normalize text content
+        text = re.sub(r'\s+', ' ', text)  # Collapse multiple spaces
+        text = re.sub(r'[^\w\s.,!?$-]', ' ', text)  # Remove special characters
         
         return text if text.strip() else None
 
+    except requests.exceptions.RequestException as e:
+        print(f"Network error while parsing {url}: {e}")
+        return None
     except Exception as e:
-        print(f"Ошибка при парсинге {url}: {e}")
+        print(f"Unexpected error parsing {url}: {e}")
         return None
 
 def parse_structured_data(url: str) -> List[str]:
-    """Извлекает структурированные данные (JSON-LD, Microdata)"""
+    """Extracts structured data from webpage including JSON-LD, microdata, and meta tags"""
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -56,55 +61,62 @@ def parse_structured_data(url: str) -> List[str]:
         soup = BeautifulSoup(response.text, "html.parser")
         products = []
 
-        # JSON-LD данные
+        # Extract from JSON-LD structured data
         json_ld_scripts = soup.find_all("script", type="application/ld+json")
         for script in json_ld_scripts:
             try:
                 data = json.loads(script.string)
                 if isinstance(data, list):
-                    data = data[0]
+                    data = data[0]  # Handle arrays of structured data
 
-                # Извлекаем продукты из структурированных данных
+                # Extract product information from structured data
                 products.extend(extract_from_structured_data(data))
 
             except json.JSONDecodeError:
+                continue  # Skip invalid JSON
+            except Exception as e:
+                print(f"Error processing JSON-LD data: {e}")
                 continue
 
-        # Open Graph и meta tags
+        # Extract from meta tags and Open Graph
         meta_products = extract_from_meta_tags(soup)
         products.extend(meta_products)
 
+        # Return unique products only
         return list(set(products))
 
+    except requests.exceptions.RequestException as e:
+        print(f"Network error fetching structured data: {e}")
+        return []
     except Exception as e:
-        print(f"Ошибка при извлечении структурированных данных: {e}")
+        print(f"Error extracting structured data: {e}")
         return []
 
 def extract_from_structured_data(data: Dict) -> List[str]:
-    """Извлекает продукты из структурированных данных"""
+    """Recursively extracts product names from structured data objects"""
     products = []
     
     if isinstance(data, dict):
-        # Product data
+        # Handle Product schema types
         if data.get("@type") in ["Product", "IndividualProduct"]:
             if name := data.get("name"):
                 products.append(str(name))
         
-        # ItemList data
+        # Handle ItemList schema (product listings)
         elif data.get("@type") == "ItemList":
             if items := data.get("itemListElement"):
                 for item in items:
                     if isinstance(item, dict) and "name" in item:
                         products.append(str(item["name"]))
         
-        # BreadcrumbList
+        # Handle BreadcrumbList schema (navigation elements)
         elif data.get("@type") == "BreadcrumbList":
             if items := data.get("itemListElement"):
                 for item in items:
                     if isinstance(item, dict) and "name" in item:
                         products.append(str(item["name"]))
         
-        # Рекурсивный поиск в глубину
+        # Recursively search nested structures
         for value in data.values():
             if isinstance(value, (dict, list)):
                 products.extend(extract_from_structured_data(value))
@@ -116,37 +128,40 @@ def extract_from_structured_data(data: Dict) -> List[str]:
     return products
 
 def extract_from_meta_tags(soup: BeautifulSoup) -> List[str]:
-    """Извлекает информацию из meta тегов"""
+    """Extracts product information from meta tags and page metadata"""
     products = []
     
-    # Open Graph title
+    # Open Graph title extraction
     if og_title := soup.find("meta", property="og:title"):
         if content := og_title.get("content"):
             products.append(content)
     
-    # Twitter title
+    # Twitter card title extraction
     if twitter_title := soup.find("meta", name="twitter:title"):
         if content := twitter_title.get("content"):
             products.append(content)
     
-    # Meta description с ключевыми словами
+    # Meta description with furniture-related keywords
     if description := soup.find("meta", attrs={"name": "description"}):
         if content := description.get("content"):
-            if any(keyword in content.lower() for keyword in ["chair", "table", "sofa", "bed", "диван", "стол", "кровать"]):
+            furniture_keywords = ["chair", "table", "sofa", "bed", "диван", "стол", "кровать"]
+            if any(keyword in content.lower() for keyword in furniture_keywords):
                 products.append(content)
     
-    # Title страницы
+    # Page title extraction
     if title_tag := soup.find("title"):
         title_text = title_tag.get_text(strip=True)
-        if title_text and len(title_text) > 5:
+        if title_text and len(title_text) > 5:  # Filter short titles
             products.append(title_text)
     
     return products
 
 def is_valid_url(url: str) -> bool:
-    """Проверяет валидность URL"""
+    """Validates URL format and structure"""
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
-    except:
+    except ValueError:
+        return False
+    except Exception:
         return False
