@@ -1,4 +1,3 @@
-```python
 """
 Main application for extracting product names from furniture store websites
 FastAPI application with HTML interface
@@ -170,4 +169,3 @@ if __name__ == "__main__":
     import uvicorn
     # Run the FastAPI application with Uvicorn server
     uvicorn.run(app, host="0.0.0.0", port=8000)
-```
